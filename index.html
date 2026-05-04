@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Chloé">
+<title>Chloé</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text',sans-serif;background:#eaf4fe;color:#0d2a4a;min-height:100vh;padding-bottom:48px}
+
+.header{background:#eaf4fe;border-bottom:0.5px solid #b0d4f0;padding:16px 20px 12px;position:sticky;top:0;z-index:10}
+.header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.app-title{font-size:14px;font-weight:700;letter-spacing:0.06em;color:#0d2a4a}
+.lvl-pill{font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;background:#fff;color:#0d2a4a;border:0.5px solid #90c4e8;letter-spacing:0.02em}
+.xp-wrap{display:flex;align-items:center;gap:10px}
+.xp-label{font-size:11px;color:#3a6a9a;white-space:nowrap}
+.xp-bg{flex:1;height:5px;background:#c8e0f0;border-radius:3px;overflow:hidden}
+.xp-fill{height:5px;background:linear-gradient(90deg,#4a9fd4,#2a7ab8);border-radius:3px;transition:width .5s ease}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:16px 20px}
+.scard{background:#fff;border-radius:14px;border:0.5px solid #c0d8f0;padding:13px 15px}
+.scard-lbl{font-size:11px;color:#3a6a9a;margin-bottom:5px;letter-spacing:0.03em;text-transform:uppercase}
+.scard-val{font-size:26px;font-weight:300;color:#0d2a4a;letter-spacing:-0.02em}
+.scard-sub{font-size:11px;color:#5a8ab0;margin-top:2px}
+
+.day-section{padding:0 20px 16px}
+.day-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.nav-btn{background:#fff;border:0.5px solid #c0d8f0;border-radius:10px;width:38px;height:38px;cursor:pointer;font-size:18px;color:#0d2a4a;display:flex;align-items:center;justify-content:center}
+.nav-btn:active{background:#eaf4fe;transform:scale(0.96)}
+.day-center{text-align:center}
+.day-name{font-size:17px;font-weight:600;color:#0d2a4a}
+.day-date{font-size:12px;color:#3a6a9a;margin-top:2px}
+.day-tag{display:inline-block;margin-top:5px;font-size:10px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;padding:3px 10px;border-radius:10px}
+.tag-semaine{background:#d0ecf8;color:#0d4a7a}
+.tag-weekend{background:#c8e4f8;color:#0d3a6a}
+
+.section-group{margin-bottom:12px}
+.group-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#3a6a9a;margin-bottom:6px;padding-left:2px}
+
+.tasks{display:flex;flex-direction:column;gap:7px}
+.task-row{display:flex;align-items:center;gap:12px;padding:13px 15px;background:#fff;border:0.5px solid #c0d8f0;border-radius:14px;cursor:pointer;transition:all .15s}
+.task-row:active{transform:scale(0.98)}
+.task-row.done{background:#e0f0fa;border-color:#90c4e8}
+.task-row.future{opacity:0.4;pointer-events:none}
+.check{width:22px;height:22px;border-radius:50%;border:1.5px solid #90c4e8;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.task-row.done .check{background:#2a7ab8;border-color:#2a7ab8}
+.check svg{display:none}
+.task-row.done .check svg{display:block}
+.task-info{flex:1;min-width:0}
+.task-name{font-size:14px;font-weight:500;color:#0d2a4a}
+.task-row.done .task-name{color:#5a8ab0;text-decoration:line-through;text-decoration-color:#90c4e8}
+.task-desc{font-size:11px;color:#5a8ab0;margin-top:2px}
+.task-xp{font-size:12px;font-weight:700;color:#2a7ab8;flex-shrink:0}
+.task-row.done .task-xp{color:#90c4e8}
+
+.week-section{padding:16px 20px 0}
+.section-lbl{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#3a6a9a;margin-bottom:10px}
+.week-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+.wday{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.wday-name{font-size:10px;color:#5a8ab0;font-weight:600}
+.wday-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#5a8ab0;background:#fff;border:0.5px solid #c0d8f0;transition:all .15s}
+.wday-dot.today{border:2px solid #2a7ab8;color:#2a7ab8;background:#fff}
+.wday-dot.full{background:#2a7ab8;color:#fff;border-color:#2a7ab8}
+.wday-dot.partial{background:#c8e4f8;color:#0d2a4a;border-color:#90c4e8}
+.wday:active .wday-dot{transform:scale(0.9)}
+
+.toast{position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#0d2a4a;color:#eaf4fe;font-size:13px;font-weight:600;padding:10px 20px;border-radius:22px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:100}
+.toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="app-title">Chloé 🌸</div>
+    <div class="lvl-pill" id="lvl-pill">Niveau 1 🌱</div>
+  </div>
+  <div class="xp-wrap">
+    <div class="xp-label" id="xp-label">0 / 80 XP</div>
+    <div class="xp-bg"><div class="xp-fill" id="xp-bar" style="width:0%"></div></div>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="scard">
+    <div class="scard-lbl">Aujourd'hui</div>
+    <div class="scard-val" id="s-today">0%</div>
+    <div class="scard-sub" id="s-today-sub">0 tâches</div>
+  </div>
+  <div class="scard">
+    <div class="scard-lbl">Streak</div>
+    <div class="scard-val" id="s-streak">0</div>
+    <div class="scard-sub">jours consécutifs</div>
+  </div>
+  <div class="scard">
+    <div class="scard-lbl">XP total</div>
+    <div class="scard-val" id="s-xp">0</div>
+    <div class="scard-sub">points</div>
+  </div>
+  <div class="scard">
+    <div class="scard-lbl">Ce mois</div>
+    <div class="scard-val" id="s-month">0%</div>
+    <div class="scard-sub">completion</div>
+  </div>
+</div>
+
+<div class="day-section">
+  <div class="day-nav">
+    <button class="nav-btn" onclick="changeDay(-1)">&#8249;</button>
+    <div class="day-center">
+      <div class="day-name" id="dn-name"></div>
+      <div class="day-date" id="dn-date"></div>
+      <div class="day-tag" id="dn-tag"></div>
+    </div>
+    <button class="nav-btn" onclick="changeDay(1)">&#8250;</button>
+  </div>
+  <div id="tasks-list"></div>
+</div>
+
+<div class="week-section">
+  <div class="section-lbl">Cette semaine</div>
+  <div class="week-strip" id="week-strip"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DAY_NAMES=['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+const DAY_SHORT=['L','M','M','J','V','S','D'];
+const MONTHS=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+
+// Tâches quotidiennes communes (tous les jours sauf exceptions notées)
+// Aucun écran après 21h : tous les jours SAUF vendredi (4) et samedi (5)
+// Sport yoga/pilates : mardi (1), jeudi (3), vendredi (4) — 3x semaine
+
+const WEEK_TASKS=[
+  // LUNDI (0)
+  {tag:'Semaine',tagCls:'tag-semaine',groups:[
+    {label:'🌅 Matin',tasks:[
+      {name:'Skincare matin',desc:'Nettoyage, sérum, SPF — 5 min',xp:8},
+    ]},
+    {label:'🚶 Corps',tasks:[
+      {name:'Marche 20 min',desc:'Air frais, lumière naturelle',xp:10},
+      {name:'Hydratation 1,5L',desc:'8 verres dans la journée',xp:6},
+    ]},
+    {label:'🏠 Maison',tasks:[
+      {name:'Rangement 10 min',desc:'Un espace propre et ordonné',xp:6},
+    ]},
+    {label:'🌙 Soir',tasks:[
+      {name:'Skincare soir',desc:'Double nettoyage, crème — 5 min',xp:8},
+      {name:'Lecture 15 min',desc:'Avant de dormir, pas d\'écran',xp:8},
+      {name:'Aucun écran après 21h',desc:'Préparation au sommeil',xp:8},
+      {name:'Sommeil 8h',desc:'Coucher avant 23h',xp:10},
+    ]},
+  ]},
+  // MARDI (1) — yoga
+  {tag:'Semaine + sport',tagCls:'tag-semaine',groups:[
+    {label:'🌅 Matin',tasks:[
+      {name:'Skincare matin',desc:'Nettoyage, sérum, SPF — 5 min',xp:8},
+    ]},
+    {label:'🧘 Sport',tasks:[
+      {name:'Yoga / pilates',desc:'30–45 min — matin ou soir',xp:15},
+    ]},
+    {label:'🚶 Corps',tasks:[
+      {name:'Marche 20 min',desc:'Air frais, lumière naturelle',xp:10},
+      {name:'Hydratation 1,5L',desc:'8 verres dans la journée',xp:6},
+    ]},
+    {label:'🏠 Maison',tasks:[
+      {name:'Rangement 10 min',desc:'Un espace propre et ordonné',xp:6},
+    ]},
+    {label:'🌙 Soir',tasks:[
+      {name:'Skincare soir',desc:'Double nettoyage, crème — 5 min',xp:8},
+      {name:'Lecture 15 min',desc:'Avant de dormir, pas d\'écran',xp:8},
+      {name:'Aucun écran après 21h',desc:'Préparation au sommeil',xp:8},
+      {name:'Sommeil 8h',desc:'Coucher avant 23h',xp:10},
+    ]},
+  ]},
+  // MERCREDI (2)
+  {tag:'Semaine',tagCls:'tag-semaine',groups:[
+    {label:'🌅 Matin',tasks:[
+      {name:'Skincare matin',desc:'Nettoyage, sérum, SPF — 5 min',xp:8},
+    ]},
+    {label:'🚶 Corps',tasks:[
+      {name:'Marche 20 min',desc:'Air frais, lumière naturelle',xp:10},
+      {name:'Hydratation 1,5L',desc:'8 verres dans la journée',xp:6},
+    ]},
+    {label:'🏠 Maison',tasks:[
+      {name:'Rangement 10 min',desc:'Un espace propre et ordonné',xp:6},
+    ]},
+    {label:'🌙 Soir',tasks:[
+      {name:'Skincare soir',desc:'Double nettoyage, crème — 5 min',xp:8},
+      {name:'Lecture 15 min',desc:'Avant de dormir, pas d\'écran',xp:8},
+      {name:'Aucun écran après 21h',desc:'Préparation au sommeil',xp:8},
+      {name:'Sommeil 8h',desc:'Coucher avant 23h',xp:10},
+    ]},
+  ]},
+  // JEUDI (3) — yoga
+  {tag:'Semaine + sport',tagCls:'tag-semaine',groups:[
+    {label:'🌅 Matin',tasks:[
+      {name:'Skincare matin',desc:'Nettoyage, sérum, SPF — 5 min',xp:8},
+    ]},
+    {label:'🧘 Sport',tasks:[
+      {name:'Yoga / pilates',desc:'30–45 min — matin ou soir',xp:15},
+    ]},
+    {label:'🚶 Corps',tasks:[
+      {name:'Marche 20 min',desc:'Air frais, lumière naturelle',xp:10},
+      {name:'Hydratation 1,5L',desc:'8 verres dans la journée',xp:6},
+    ]},
+    {label:'🏠 Maison',tasks:[
+      {name:'Rangement 10 min',desc:'Un espace propre et ordonné',xp:6},
+    ]},
+    {label:'🌙 Soir',tasks:[
+      {name:'Skincare soir',desc:'Double nettoyage, crème — 5 min',xp:8},
+      {name:'Lecture 15 min',desc:'Avant de dormir, pas d\'écran',xp:8},
+      {name:'Aucun écran après 21h',desc:'Préparation au sommeil',xp:8},
+      {name:'Sommeil 8h',desc:'Coucher avant 23h',xp:10},
+    ]},
+  ]},
+  // VENDREDI (4) — yoga, pas d'écran désactivé
+  {tag:'Vendredi',tagCls:'tag-semaine',groups:[
+    {label:'🌅 Matin',tasks:[
+      {name:'Skincare matin',desc:'Nettoyage, sérum, SPF — 5 min',xp:8},
+    ]},
+    {label:'🧘 Sport',tasks:[
+      {name:'Yoga / pilates',desc:'Session douce — étirements',xp:15},
+    ]},
+    {label:'🚶 Corps',tasks:[
+      {name:'Marche 20 min',desc:'Air frais, lumière naturelle',xp:10},
+      {name:'Hydratation 1,5L',desc:'8 verres dans la journée',xp:6},
+    ]},
+    {label:'🏠 Maison',tasks:[
+      {name:'Rangement 10 min',desc:'Un espace propre et ordonné',xp:6},
+    ]},
+    {label:'🌙 Soir',tasks:[
+      {name:'Skincare soir',desc:'Double nettoyage + masque vendredi',xp:10},
+      {name:'Lecture 15 min',desc:'Avant de dormir, pas d\'écran',xp:8},
+      {name:'Sommeil 8h',desc:'Coucher avant 23h',xp:10},
+    ]},
+  ]},
+  // SAMEDI (5) — pas d'écran désactivé
+  {tag:'Weekend',tagCls:'tag-weekend',groups:[
+    {label:'🌅 Matin',tasks:[
+      {name:'Skincare matin',desc:'Nettoyage, sérum, SPF — 5 min',xp:8},
+    ]},
+    {label:'🚶 Corps',tasks:[
+      {name:'Marche 20 min',desc:'Air frais, sortie active',xp:10},
+      {name:'Hydratation 1,5L',desc:'8 verres dans la journée',xp:6},
+    ]},
+    {label:'🏠 Maison',tasks:[
+      {name:'Rangement 10 min',desc:'Un espace propre et ordonné',xp:6},
+    ]},
+    {label:'💛 Couple',tasks:[
+      {name:'Connexion relation',desc:'Temps de qualité avec conjoint',xp:10},
+    ]},
+    {label:'🌙 Soir',tasks:[
+      {name:'Skincare soir',desc:'Double nettoyage, crème — 5 min',xp:8},
+      {name:'Lecture 15 min',desc:'Avant de dormir, pas d\'écran',xp:8},
+      {name:'Sommeil 8h',desc:'Coucher avant 23h',xp:10},
+    ]},
+  ]},
+  // DIMANCHE (6)
+  {tag:'Weekend — reset',tagCls:'tag-weekend',groups:[
+    {label:'🌅 Matin',tasks:[
+      {name:'Skincare matin',desc:'Nettoyage, sérum, SPF — 5 min',xp:8},
+    ]},
+    {label:'🚶 Corps',tasks:[
+      {name:'Marche 20 min',desc:'Nature, déconnexion',xp:10},
+      {name:'Hydratation 1,5L',desc:'8 verres dans la journée',xp:6},
+    ]},
+    {label:'🏠 Maison',tasks:[
+      {name:'Rangement 10 min',desc:'Un espace propre et ordonné',xp:6},
+      {name:'Grand ménage',desc:'Nettoyage complet de la maison',xp:12},
+      {name:'Préparation repas semaine',desc:'Batch cooking, frigo prêt',xp:12},
+    ]},
+    {label:'📅 Semaine',tasks:[
+      {name:'Préparation semaine',desc:'Vêtements, agenda, objectifs',xp:8},
+    ]},
+    {label:'🌙 Soir',tasks:[
+      {name:'Skincare soir',desc:'Double nettoyage, crème — 5 min',xp:8},
+      {name:'Lecture 15 min',desc:'Avant de dormir, pas d\'écran',xp:8},
+      {name:'Aucun écran après 21h',desc:'Coucher tôt — récup pour lundi',xp:8},
+      {name:'Sommeil 8h',desc:'Coucher avant 22h30',xp:10},
+    ]},
+  ]},
+];
+
+const LEVELS=[
+  {min:0,max:80,name:'Niveau 1 🌱',n:1},
+  {min:80,max:220,name:'Niveau 2 🪴',n:2},
+  {min:220,max:450,name:'Niveau 3 🌿',n:3},
+  {min:450,max:800,name:'Niveau 4 🌲',n:4},
+  {min:800,max:1300,name:'Niveau 5 🌳',n:5},
+  {min:1300,max:2000,name:'Niveau 6 🌺',n:6},
+  {min:2000,max:99999,name:'Avatar 🌸',n:7},
+];
+
+const STORAGE_KEY='avatar-tracker-chloe-v3';
+let data={};
+let viewDate=new Date();viewDate.setHours(0,0,0,0);
+const today=new Date();today.setHours(0,0,0,0);
+
+function dKey(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dow(d){return(d.getDay()+6)%7}
+
+function load(){
+  try{const r=localStorage.getItem(STORAGE_KEY);if(r)data=JSON.parse(r);}catch(e){data={};}
+  render();
+}
+function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(data));}catch(e){}}
+
+function allTasks(wd){return WEEK_TASKS[wd].groups.flatMap(g=>g.tasks)}
+
+function totalXP(){
+  let x=0;
+  for(const k in data){
+    const wd=new Date(k+'T00:00:00');const tasks=allTasks(dow(wd));
+    (data[k]||[]).forEach((v,i)=>{if(v&&tasks[i])x+=tasks[i].xp;});
+  }
+  return x;
+}
+
+function getLvl(xp){for(let i=LEVELS.length-1;i>=0;i--)if(xp>=LEVELS[i].min)return LEVELS[i];return LEVELS[0];}
+
+function getStreak(){
+  let s=0;let d=new Date(today);
+  while(true){
+    const k=dKey(d);const tasks=allTasks(dow(d));
+    const done=(data[k]||[]).filter(Boolean).length;
+    if(done<Math.ceil(tasks.length/2))break;
+    s++;d.setDate(d.getDate()-1);
+  }
+  return s;
+}
+
+function monthCompletion(){
+  const y=today.getFullYear(),m=today.getMonth();
+  let total=0,done=0;
+  for(let d=1;d<=today.getDate();d++){
+    const dt=new Date(y,m,d);const k=dKey(dt);const tasks=allTasks(dow(dt));
+    total+=tasks.length;done+=(data[k]||[]).filter(Boolean).length;
+  }
+  return total?Math.round(done/total*100):0;
+}
+
+function render(){
+  const xp=totalXP();const lvl=getLvl(xp);
+  document.getElementById('lvl-pill').textContent=lvl.name;
+  const pct=lvl.max<99999?Math.round((xp-lvl.min)/(lvl.max-lvl.min)*100):100;
+  document.getElementById('xp-bar').style.width=pct+'%';
+  document.getElementById('xp-label').textContent=xp+' / '+(lvl.max<99999?lvl.max:'MAX')+' XP';
+  document.getElementById('s-xp').textContent=xp;
+  document.getElementById('s-streak').textContent=getStreak();
+  document.getElementById('s-month').textContent=monthCompletion()+'%';
+
+  const vk=dKey(viewDate);const wd=dow(viewDate);
+  const wt=WEEK_TASKS[wd];
+  const tasks=allTasks(wd);
+  const dayData=data[vk]||[];
+  const doneCnt=dayData.filter(Boolean).length;
+  const isToday=vk===dKey(today);
+
+  document.getElementById('dn-name').textContent=DAY_NAMES[wd]+(isToday?' — Aujourd\'hui':'');
+  document.getElementById('dn-date').textContent=viewDate.getDate()+' '+MONTHS[viewDate.getMonth()]+' '+viewDate.getFullYear();
+  const tagEl=document.getElementById('dn-tag');
+  tagEl.textContent=wt.tag;tagEl.className='day-tag '+wt.tagCls;
+
+  if(isToday){
+    document.getElementById('s-today').textContent=tasks.length?Math.round(doneCnt/tasks.length*100)+'%':'—';
+    document.getElementById('s-today-sub').textContent=doneCnt+'/'+tasks.length+' faites';
+  }
+
+  const container=document.getElementById('tasks-list');container.innerHTML='';
+  const isFuture=viewDate>today;
+  let globalIdx=0;
+
+  wt.groups.forEach(group=>{
+    const groupDiv=document.createElement('div');groupDiv.className='section-group';
+    const lbl=document.createElement('div');lbl.className='group-label';lbl.textContent=group.label;
+    groupDiv.appendChild(lbl);
+    const taskWrap=document.createElement('div');taskWrap.className='tasks';
+    group.tasks.forEach(t=>{
+      const i=globalIdx++;
+      const done=!!(dayData[i]);
+      const row=document.createElement('div');
+      row.className='task-row'+(done?' done':'')+(isFuture?' future':'');
+      row.innerHTML=`<div class="check"><svg width="11" height="11" viewBox="0 0 11 11" fill="none"><polyline points="1.5,5.5 4.5,8.5 9.5,2.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="task-info"><div class="task-name">${t.name}</div><div class="task-desc">${t.desc}</div></div><div class="task-xp">+${t.xp}</div>`;
+      const idx=i;
+      if(!isFuture)row.onclick=()=>toggle(vk,idx,tasks);
+      taskWrap.appendChild(row);
+    });
+    groupDiv.appendChild(taskWrap);
+    container.appendChild(groupDiv);
+  });
+
+  renderWeekStrip();
+}
+
+function toggle(k,i,tasks){
+  if(!data[k])data[k]=[];
+  while(data[k].length<=i)data[k].push(false);
+  data[k][i]=!data[k][i];
+  save();
+  if(data[k].filter(Boolean).length===tasks.length)showToast('Journée complète 🌸');
+  render();
+}
+
+function renderWeekStrip(){
+  const strip=document.getElementById('week-strip');strip.innerHTML='';
+  const mon=new Date(today);mon.setDate(today.getDate()-dow(today));
+  for(let i=0;i<7;i++){
+    const d=new Date(mon);d.setDate(mon.getDate()+i);
+    const k=dKey(d);const tasks=allTasks(dow(d));
+    const done=(data[k]||[]).filter(Boolean).length;
+    const isT=k===dKey(today);const isFut=d>today;
+    let cls='wday-dot';
+    if(!isFut&&done===tasks.length)cls+=' full';
+    else if(!isFut&&done>0)cls+=' partial';
+    if(isT)cls+=' today';
+    const cell=document.createElement('div');cell.className='wday';
+    cell.innerHTML=`<div class="wday-name">${DAY_SHORT[i]}</div><div class="${cls}">${d.getDate()}</div>`;
+    cell.onclick=()=>{viewDate=new Date(d);render();};
+    strip.appendChild(cell);
+  }
+}
+
+function changeDay(delta){viewDate.setDate(viewDate.getDate()+delta);render();}
+
+let toastTimer;
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2200);
+}
+
+load();
+</script>
+</body>
+</html>
